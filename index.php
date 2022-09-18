@@ -2,8 +2,6 @@
 session_start();
 include "./app/models/Connect.php";
 
-
-
 ?>
 
 
