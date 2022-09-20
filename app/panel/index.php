@@ -1,3 +1,34 @@
+<?php
+session_start();
+include '../models/Connect.php';
+include '../../public/library/jdf.php';
+
+if(!isset($_SESSION['user'])){
+    header("location:../../index.php");
+    exit();
+}
+
+if(isset($_GET['event']) && $_GET['event'] === 'sign_out'){
+    $user_id = $_SESSION['user']['id'];
+    $exit = $connection->query("UPDATE users SET `status`=0 WHERE ID='$user_id'");
+    unset($_SESSION['user']);
+    if(!isset($_SESSION['user'])){
+        header("location:../../index.php");
+        exit();
+    }else {
+        unset($_SESSION['user']);
+        header("location:../../index.php");
+        exit();
+    }
+}
+
+
+
+
+?>
+
+
+
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 
@@ -13,7 +44,7 @@
 
     <link rel="stylesheet" href="/blog/public/styles/css/main.css">
 
-    <title>codeyad blog</title>
+    <title>پنل کاربری: <?php echo $_SESSION['user']['name']; ?></title>
 </head>
 
 <body>
@@ -21,87 +52,60 @@
     <section x-data="toggleSidebar" class="bg-info">
         <section x-cloak class="sidebar bg-light" :class="open || 'inactive'">
             <div class="d-flex align-items-center justify-content-between justify-content-lg-center">
-                <h4 class="fw-bold">codeyad blog</h4>
+                <h4 class="fw-bold">localhost blog</h4>
                 <i @click="toggle" class="d-lg-none fs-1 bi bi-x"></i>
             </div>
             <div class="mt-4">
                 <ul class="list-unstyled">
                     <li class="sidebar-item active">
-                        <a class="sidebar-link" href="./index.html">
+                        <a class="sidebar-link" href="./index.php">
                             <i class="me-2 bi bi-grid-fill"></i>
                             <span>داشبورد</span>
                         </a>
                     </li>
 
-                    <li x-data="dropdown" class="sidebar-item">
-                        <div @click="toggle" class="sidebar-link">
-                            <i class="me-2 bi bi-shop"></i>
-                            <span>فروشگاه</span>
-                            <i class="ms-auto bi bi-chevron-down"></i>
-                        </div>
-                        <ul x-show="open" x-transition class="submenu">
-                            <li class="submenu-item">
-                                <a href="#">لیست فروشگاه ها</a>
-                            </li>
-                            <li class="submenu-item">
-                                <a href="#">ایجاد فروشگاه</a>
-                            </li>
-                            <li class="submenu-item">
-                                <a href="#">ویرایش فروشگاه</a>
-                            </li>
-                        </ul>
-                    </li>
+
+                   <?php if($_SESSION['user']['role'] >=5){?>
 
                     <li x-data="dropdown" class="sidebar-item">
                         <div @click="toggle" class="sidebar-link">
                             <i class="me-2 bi bi-box-seam"></i>
-                            <span>محصولات</span>
+                            <span>مقالات</span>
                             <i class="ms-auto bi bi-chevron-down"></i>
                         </div>
                         <ul x-show="open" x-transition class="submenu">
                             <li class="submenu-item">
-                                <a href="./products_index.html">لیست محصولات</a>
+                                <a href="./products_index.html">لیست مقاله ها</a>
                             </li>
                             <li class="submenu-item">
-                                <a href="#">ایجاد محصول</a>
+                                <a href="#">ایجاد مقاله</a>
                             </li>
                             <li class="submenu-item">
-                                <a href="#">ویرایش محصول</a>
+                                <a href="#">ویرایش مقاله</a>
                             </li>
                         </ul>
                     </li>
+                    <?php }?>
 
-                    <li x-data="dropdown" class="sidebar-item">
+                    <?php if($_SESSION['user']['role'] >= 10){?>
+
+                        <li x-data="dropdown" class="sidebar-item">
                         <div @click="toggle" class="sidebar-link">
                             <i class="me-2 bi bi-basket-fill"></i>
-                            <span>سفارشات</span>
+                            <span>درخواست ها</span>
                             <i class="ms-auto bi bi-chevron-down"></i>
                         </div>
                         <ul x-show="open" x-transition class="submenu">
                             <li class="submenu-item">
-                                <a href="#">لیست سفارشات</a>
+                                <a href="./index.php?event=request_list">لیست درخواست ها</a>
                             </li>
                             <li class="submenu-item">
-                                <a href="#">سفارشات تایید شده</a>
+                                <a href="./index.php?event=accepted_requests">درخواست تایید شده</a>
                             </li>
                             <li class="submenu-item">
-                                <a href="#">سفارشات تایید نشده</a>
+                                <a href="./index.php?event=wait_requests">درخواست تایید نشده</a>
                             </li>
                         </ul>
-                    </li>
-
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="#">
-                            <i class="me-2 bi bi-percent"></i>
-                            <span>تخفیف ها</span>
-                        </a>
-                    </li>
-
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="#">
-                            <i class="me-2 bi bi-chat-right-dots-fill"></i>
-                            <span>تیکت</span>
-                        </a>
                     </li>
 
                     <li x-data="dropdown" class="sidebar-item">
@@ -112,22 +116,28 @@
                         </div>
                         <ul x-show="open" x-transition class="submenu">
                             <li class="submenu-item">
-                                <a href="#">لیست کاربران</a>
+                                <a href="./index.php?event=users">لیست کاربران</a>
                             </li>
                             <li class="submenu-item">
-                                <a href="#">ایجاد کاربران</a>
+                                <a href="./event.php?event=create_user">ایجاد کاربران</a>
                             </li>
                             <li class="submenu-item">
-                                <a href="#">ویرایش کاربران</a>
+                                <a href="./index.php?event=users">ویرایش کاربران</a>
                             </li>
                         </ul>
                     </li>
+                    <?php }?>
+
+
 
                     <li x-data="dropdown" class="sidebar-item">
-                        <div @click="toggle" class="sidebar-link">
+                     
+                        <div @click="toggle" class="sidebar-link btn-danger">
                             <i class="me-2 bi bi-power"></i>
+                            <a class="nav-link text-body p-0 m-0" href="./index.php?event=sign_out">
                             <span> خروج</span>
-                            <i class="ms-auto bi "></i>
+                            </a>
+                            <i class="ms-auto bi"></i>
                         </div>
                         <ul x-show="open" x-transition class="submenu">
                            
@@ -142,6 +152,63 @@
         </section>
     </section>
 
+
+    <?php if(isset($_GET['event']) & $_SESSION['user']['role'] >= 10){ 
+            if($_GET['event'] === 'users'){?>
+            <div class="row mt-5 justify-content-center">
+                <div class="col-6 mt-5">
+                     
+                <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Name</th>
+      <th scope="col">Email</th>
+      <th scope="col">Role</th>
+      <th scope="col">register time</th>
+      <th scope="col">last login</th>
+      <th scope="col">status</th>
+      <th scope="col">events</th>
+      <th scope="col">events</th>
+
+    </tr>
+  </thead>
+  <tbody>
+    <?php 
+        $result = $connection->query("SELECT * FROM users");
+        if($result->num_rows > 0){
+            while($users = $result->fetch_assoc()){
+
+    ?>
+  <tr>
+      <th scope="row"><?php echo $users['ID'];?></th>
+      <td><?php echo $users['Name']; ?></td>
+      <td><?php echo $users['Email']; ?></td>
+        <td><?php
+        if($users['Role'] == 1){
+            echo "user";
+        }elseif ($users['Role'] > 1 & $users['Role'] <10){
+            echo "writter";
+        }elseif($users['Role'] >= 10) {
+            echo "admin";
+        }
+        ?></td>
+      <td><?php echo $users['create_time']; ?></td>
+      <td><?php echo $users['last_login']; ?></td>
+      <td><?php $users['status'] === 0?"offline":"online"; ?></td>
+      <td>
+        <a class="btn btn-warning" href="./event.php?event=edit&id=<?php echo $users['ID'];?>">Edit</a>
+      </td>
+      <td>
+      <a class="btn btn-danger" href="./event.php?event=delete&id=<?php echo $users['ID'];?>">Delete</a>
+      </td>
+    </tr>
+        <?php }}}}?>
+    </tbody>
+</table>
+
+                </div>
+            </div>
 
 
 
