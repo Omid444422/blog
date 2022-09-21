@@ -1,3 +1,18 @@
+<?php
+include "../models/Connect.php";
+
+if(isset($_GET['id'])){
+    $id = $_GET['id'];
+    $check = $connection->query("SELECT * FROM articles WHERE ID='$id'");
+    if($check->num_rows <= 0){
+        header("location:../../index.php");
+    }
+}else{
+    header("location:../../index.php");
+}
+
+?>
+
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -5,18 +20,18 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Bootstrap -->
-    <link rel="stylesheet" href="styles/css/bootstrap.min.css">
-    <link rel="stylesheet" href="styles/css/style.css">
+    <link rel="stylesheet" href="/blog/public/styles/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/blog/public/styles/css/style.css">
     <!-- Css Reset -->
-    <link rel="stylesheet" href="styles/css/reset.css">
+    <link rel="stylesheet" href="/blog/public/styles/css/reset.css">
     <!-- NavBar Style -->
-    <link rel="stylesheet" href="styles/css/nav.css">
+    <link rel="stylesheet" href="/blog/public/styles/css/nav.css">
     <!-- Footer Style -->
-    <link rel="stylesheet" href="styles/css/footer.css">
+    <link rel="stylesheet" href="/blog/public/styles/css/footer.css">
     <!-- Main Css -->
-    <link rel="stylesheet" href="styles/css/single.css">
+    <link rel="stylesheet" href="/blog/public/styles/css/single.css">
     <!-- Vazir Font -->
-    <link rel="stylesheet" href="fonts/vazir.css">
+    <link rel="stylesheet" href="/blog/public/fonts/vazir.css">
     <!-- Fontawsome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <title>پست</title>
@@ -43,7 +58,7 @@
                     </svg>
                 </button>
                 <button id="switchTheme"></button>
-                <a class="navbar-brand text-white fw-bold fs-5" href="/index.html"><img src="https://codeyad.com/assets/images/logo.png?v=LeGU9ZpNcH1zdFN4EVqXRwoS_Iaehq3X46AqXt2uWPk" alt="Codeyad"></a>
+                <a class="navbar-brand text-white fw-bold fs-5" href="../../index.php"><img src="https://codeyad.com/assets/images/logo.png?v=LeGU9ZpNcH1zdFN4EVqXRwoS_Iaehq3X46AqXt2uWPk" alt="Codeyad"></a>
             </div>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar">
@@ -54,31 +69,48 @@
             <div class="collapse navbar-collapse right-nav justify-content-start" id="navbar">
                 <ul class="navbar-nav nav-left">
                     <li class="nav-item me-0">
-                        <a class="nav-link mt-3 mt-lg-0" href="/index.html">
+                        <a class="nav-link mt-3 mt-lg-0" href="../../index.php">
                             <i class="fa fa-home" aria-hidden="true"></i>
                             <span>خانه</span>
                         </a>
                     </li>
                     <li class="nav-item me-0">
-                        <a class="nav-link mt-3 mt-lg-0" href="/posts.html">
+                        <a class="nav-link mt-3 mt-lg-0" href="./posts.php">
                             <i class="fas fa-list"></i>
                             <span>پست ها</span>
                         </a>
                     </li>
-                    
-                    <li class="nav-item me-0">
-                        <a class="nav-link mt-3 mt-lg-0" href="/login.html">
+                   <?php
+                   if(isset($_SESSION['user'])){
+                   ?>
+ 
+ <li class="nav-item me-0">
+                        <a class="nav-link mt-3 mt-lg-0" href="../panel/index.php">
                             <i class="fa fa-sign-in ms-1"></i>
-                            <span>ورود</span>
+                            <span>خوش آمدید | <?php echo $_SESSION['user']['name'];?> </span>
                         </a>
                     </li>
-                    
-                    <li class="nav-item me-0">
-                        <a class="nav-link mt-3 mt-lg-0" href="/register.html">
+                    <?php }else{?>
+
+                        <li class="nav-item me-0">
+                        <a class="nav-link mt-3 mt-lg-0" href="./login.php">
                             <i class="fa fa-user-plus ms-1"></i>
                             <span>عضویت</span>
                         </a>
                     </li>
+                     
+
+
+                        <li class="nav-item me-0">
+                        <a class="nav-link mt-3 mt-lg-0" href="./register.php">
+                            <i class="fa fa-user-plus ms-1"></i>
+                            <span>عضویت</span>
+                        </a>
+                    </li>
+                    <?php }?>
+                   
+
+
                 </ul>
             </div>
 
@@ -90,19 +122,23 @@
     <main style="margin-top: 10rem; margin-bottom: 5rem;">
         <div class="post-container w-100 mx-auto">
             <div class="content bg-white">
-                <h4 class="title">php یا nodejs ?</h4>
-                <span class="date">نوشته شده توسط m</span>
-                <span class="author">12 تیر 1401</span>
+                <?php 
+                $result = $connection->query("SELECT * FROM articles WHERE status='1' AND ID='$id'");
+                if($result->num_rows >0){
+                    while($post = $result->fetch_assoc()){
+                ?>
+                <h4 class="title"><?php echo $post['article_title']; ?></h4>
+                <span class="date"><?php echo $post['creator']; ?></span>
+                <span class="author"><?php echo $post['create_time']; ?></span>
 
                 <div class="img w-100">
-                    <img src="images/post_img.png" alt="Image" class="w-100 rounded">
+                    <img src="/blog/public/uploads/<?php echo $post['image_src']; ?>" alt="<?php echo $post['image_alt']; ?>" class="w-100 rounded">
                 </div>
 
-                <p class="desc">لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است و برای شرایط فعلی تکنولوژی مورد نیاز و کاربردهای متنوع با هدف بهبود ابزارهای کاربردی می باشد کتابهای زیادی در شصت و سه درصد گذشته حال و آینده</p>
-                <p class="desc">لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است و برای شرایط فعلی تکنولوژی مورد نیاز و کاربردهای متنوع با هدف بهبود ابزارهای کاربردی می باشد کتابهای زیادی در شصت و سه درصد گذشته حال و آینده</p>
-                <p class="desc">لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است و برای شرایط فعلی تکنولوژی مورد نیاز و کاربردهای متنوع با هدف بهبود ابزارهای کاربردی می باشد کتابهای زیادی در شصت و سه درصد گذشته حال و آینده</p>
-                <p class="desc">لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است و برای شرایط فعلی تکنولوژی مورد نیاز و کاربردهای متنوع با هدف بهبود ابزارهای کاربردی می باشد کتابهای زیادی در شصت و سه درصد گذشته حال و آینده</p>
-                <p class="desc">لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است و برای شرایط فعلی تکنولوژی مورد نیاز و کاربردهای متنوع با هدف بهبود ابزارهای کاربردی می باشد کتابهای زیادی در شصت و سه درصد گذشته حال و آینده</p>
+                <p class="desc">
+                    <?php echo $post['article_description']; ?>
+                </p>
+                    <?php }}?>
             </div>
         </div>
     </main>
