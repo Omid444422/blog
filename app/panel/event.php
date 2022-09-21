@@ -18,12 +18,27 @@ if($_SESSION['user']['role'] < 10){
     exit();
 }
 
-if(isset($_GET['event']) || isset($_GET['id'])){
+if(isset($_GET['event']) & isset($_GET['id'])){
    $id = $_GET['id'];
 }else {
-    header("location:./index.php?event=users");
-}
+    if(isset($_GET['event']) & isset($_GET['article_id'])){
+        $article_id = $_GET['article_id'];
+    }else{
+    header("location:./index.php");
+    }}
 
+
+    if($_GET['event'] === "delete" & isset($_GET['article_id'])){
+        $delete_art = $connection->query("DELETE FROM articles WHERE ID='$article_id'");
+        $connection->close();
+        header("location:./index.php?event=request_list");
+    }
+
+    if($_GET['event'] === "accept" & isset($_GET['article_id'])){
+        $delete_art = $connection->query("UPDATE articles SET `status`=1 WHERE ID='$article_id'");
+        $connection->close();
+        header("location:./index.php?event=request_list");
+    }
 
 
 

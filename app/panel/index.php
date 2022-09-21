@@ -275,6 +275,199 @@ $success = "";
                 <?php }}?>
 
 
+
+                    <?php
+                    // select all articles without any filters
+                    if(isset($_GET['event']) & $_SESSION['user']['role'] >= 10){
+                        if($_GET['event'] === 'request_list'){
+                    ?>
+                        <div class="row justify-content-center">
+                            <div class="col-6">
+
+                                    <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+        <th scope="col">name</th>
+        <th scope="col">description</th>
+        <th scope="col">status</th>
+        <th scope="col">create time</th>
+        <th scope="col">views</th>
+        <th scope="col">image</th>
+        <th scope="col">creator</th>
+        <th>events</th>
+    </tr>
+  </thead>
+  <tbody>
+        
+            <?php 
+                //  ////////// select all without any filter
+              $result = $connection->query("SELECT * FROM articles");
+              if($result->num_rows > 0){
+                  while($articles = $result->fetch_assoc()){
+            ?>
+            <tr>
+                <th scope="col"><?php echo $articles['ID']; ?></th>
+                <td><?php echo $articles['article_title']; ?></td>
+                <td><a href="../pages/single.php?id=<?php echo $articles['ID'];?>">description</a></td>
+                <td><?php echo $articles['status'] ==0 ?"waiting":"accepted";?></td>
+                <td><?php echo $articles['create_time']; ?></td>
+                <td><?php echo $articles['views']; ?></td>
+                <td><a href="/blog/public/uploads/<?php echo $articles['image_src']; ?>">image</a></td>
+                <td>
+                    <?php
+                    $creator_name = $connection->query("SELECT * FROM users WHERE ID='$articles[creator]'");
+                    if($creator_name->num_rows > 0){
+                        while($name = $creator_name->fetch_assoc()){
+                            echo  "id= $articles[creator] name: $name[Name]";
+                        }
+                    }
+                    ?>
+                </td>
+                <td>
+                    <a class="btn btn-danger" href="./event.php?article_id=<?php echo $articles['ID'];?>&event=delete">delete</a>
+                </td>
+            </tr>
+                    <?php }}?>
+  </tbody>
+</table>
+        
+                            </div>
+                        </div>
+                            <?php }}?>
+
+
+
+
+
+                            <?php
+                            // select accepted articles
+                    if(isset($_GET['event']) & $_SESSION['user']['role'] >= 10){
+                        if($_GET['event'] === 'accepted_requests'){
+                    ?>
+                        <div class="row justify-content-center">
+                            <div class="col-6">
+
+                                    <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+        <th scope="col">name</th>
+        <th scope="col">description</th>
+        <th scope="col">status</th>
+        <th scope="col">create time</th>
+        <th scope="col">views</th>
+        <th scope="col">image</th>
+        <th scope="col">creator</th>
+    </tr>
+  </thead>
+  <tbody>
+        
+            <?php 
+                //  ////////// select accepted articles
+              $result = $connection->query("SELECT * FROM articles WHERE `status`=1");
+              if($result->num_rows > 0){
+                  while($articles = $result->fetch_assoc()){
+            ?>
+            <tr>
+                <th scope="col"><?php echo $articles['ID']; ?></th>
+                <td><?php echo $articles['article_title']; ?></td>
+                <td><a href="../pages/single.php?id=<?php echo $articles['ID'];?>">description</a></td>
+                <td><?php echo $articles['status'] ==0 ?"waiting":"accepted";?></td>
+                <td><?php echo $articles['create_time']; ?></td>
+                <td><?php echo $articles['views']; ?></td>
+                <td><a href="/blog/public/uploads/<?php echo $articles['image_src']; ?>">image</a></td>
+                <td>
+                    <?php
+                    $creator_name = $connection->query("SELECT * FROM users WHERE ID='$articles[creator]'");
+                    if($creator_name->num_rows > 0){
+                        while($name = $creator_name->fetch_assoc()){
+                            echo  "id= $articles[creator] name: $name[Name]";
+                        }
+                    }
+                    ?>
+                </td>
+            </tr>
+                    <?php }}?>
+  </tbody>
+</table>
+        
+                            </div>
+                        </div>
+                            <?php }}?>
+
+
+
+
+                            <?php
+                            // select waiting articles
+                    if(isset($_GET['event']) & $_SESSION['user']['role'] >= 10){
+                        if($_GET['event'] === 'wait_requests'){
+                    ?>
+                        <div class="row justify-content-center">
+                            <div class="col-6">
+
+                                    <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+        <th scope="col">name</th>
+        <th scope="col">description</th>
+        <th scope="col">status</th>
+        <th scope="col">create time</th>
+        <th scope="col">views</th>
+        <th scope="col">image</th>
+        <th scope="col">creator</th>
+        <th scope="col">events</th>
+        <th scope="col">events</th>
+    </tr>
+  </thead>
+  <tbody>
+        
+            <?php 
+                //  ////////// select waiting articles
+              $result = $connection->query("SELECT * FROM articles WHERE `status`=0");
+              if($result->num_rows > 0){
+                  while($articles = $result->fetch_assoc()){
+            ?>
+            <tr>
+                <th scope="col"><?php echo $articles['ID']; ?></th>
+                <td><?php echo $articles['article_title']; ?></td>
+                <td><a href="../pages/single.php?id=<?php echo $articles['ID'];?>">description</a></td>
+                <td><?php echo $articles['status'] ==0 ?"waiting":"accepted";?></td>
+                <td><?php echo $articles['create_time']; ?></td>
+                <td><?php echo $articles['views']; ?></td>
+                <td><a href="/blog/public/uploads/<?php echo $articles['image_src']; ?>">image</a></td>
+                <td>
+                    <?php
+                    $creator_name = $connection->query("SELECT * FROM users WHERE ID='$articles[creator]'");
+                    if($creator_name->num_rows > 0){
+                        while($name = $creator_name->fetch_assoc()){
+                            echo  "id= $articles[creator] name: $name[Name]";
+                        }
+                    }
+                    ?>
+                </td>
+                <td>
+                    <a class="btn btn-success" href="./event.php?article_id=<?php echo $articles['ID'];?>&event=accept">accpet</a>
+                </td>
+
+                <td>
+                    <a class="btn btn-danger" href="./event.php?article_id=<?php echo $articles['ID'];?>&event=delete">remove</a>
+                </td>
+            </tr>
+                    <?php }}?>
+  </tbody>
+</table>
+        
+                            </div>
+                        </div>
+                            <?php }}?>
+
+
+
+
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous">
         </script>
@@ -291,6 +484,7 @@ $success = "";
     <script src="/blog/public/js/charts/chart1.js"></script>
     <script src="/blog/public/js/charts/chart2.js"></script>
     <script src="/blog/public/js/alpineComponents.js"></script>
+
 </body>
 
 </html>
