@@ -1,4 +1,5 @@
 <?php
+session_start();
 include "../models/Connect.php";
 
 if(isset($_GET['id'])){
@@ -12,7 +13,9 @@ if(isset($_GET['id'])){
         $update = $connection->query("UPDATE articles SET `views`='$view_count' WHERE ID='$id'");
        }
     }else {
+      if($_SESSION['user']['role'] < 10){
         header("location:../../index.php");
+      }
     }
 }else{
     header("location:../../index.php");
@@ -130,6 +133,8 @@ if(isset($_GET['id'])){
         <div class="post-container w-100 mx-auto">
             <div class="content bg-white">
                 <?php 
+                if(isset($_SESSION['user'])){
+                    if($_SESSION['user']['role'] < 10){
                 $result = $connection->query("SELECT * FROM articles WHERE status='1' AND ID='$id'");
                 if($result->num_rows >0){
                     while($post = $result->fetch_assoc()){
@@ -146,7 +151,29 @@ if(isset($_GET['id'])){
                 <p class="desc">
                     <?php echo $post['article_description']; ?>
                 </p>
-                    <?php }}?>
+                    <?php }}}}?>
+
+                    <?php 
+                if($_SESSION['user']['role'] >= 10){
+                $result = $connection->query("SELECT * FROM articles WHERE ID='$id'");
+                if($result->num_rows >0){
+                    while($post = $result->fetch_assoc()){
+                ?>
+                <h4 class="title">article name: <?php echo $post['article_title']; ?></h4>
+                <span class="date">created by: <?php echo $post['creator']; ?></span>
+                <span class="date">view count: <?php echo $post['views']; ?></span>
+                <span class="author">create time: <?php echo $post['create_time']; ?></span>
+
+                <div class="img w-100">
+                    <img src="/blog/public/uploads/<?php echo $post['image_src']; ?>" alt="<?php echo $post['image_alt']; ?>" class="w-100 rounded">
+                </div>
+
+                <p class="desc">
+                    <?php echo $post['article_description']; ?>
+                </p>
+                    <?php }}}?>
+
+
             </div>
         </div>
     </main>
