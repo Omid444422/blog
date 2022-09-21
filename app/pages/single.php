@@ -3,8 +3,15 @@ include "../models/Connect.php";
 
 if(isset($_GET['id'])){
     $id = $_GET['id'];
-    $check = $connection->query("SELECT * FROM articles WHERE ID='$id'");
-    if($check->num_rows <= 0){
+    $check = $connection->query("SELECT * FROM articles WHERE `status`=1 AND ID='$id'");
+    if($check->num_rows > 0){
+       $view = $connection->query("SELECT * FROM articles WHERE ID='$id'");
+       while($db = $view->fetch_assoc()){
+        $view_count = $db['views'];
+        $view_count++;
+        $update = $connection->query("UPDATE articles SET `views`='$view_count' WHERE ID='$id'");
+       }
+    }else {
         header("location:../../index.php");
     }
 }else{
@@ -127,9 +134,10 @@ if(isset($_GET['id'])){
                 if($result->num_rows >0){
                     while($post = $result->fetch_assoc()){
                 ?>
-                <h4 class="title"><?php echo $post['article_title']; ?></h4>
-                <span class="date"><?php echo $post['creator']; ?></span>
-                <span class="author"><?php echo $post['create_time']; ?></span>
+                <h4 class="title">article name: <?php echo $post['article_title']; ?></h4>
+                <span class="date">created by: <?php echo $post['creator']; ?></span>
+                <span class="date">view count: <?php echo $post['views']; ?></span>
+                <span class="author">create time: <?php echo $post['create_time']; ?></span>
 
                 <div class="img w-100">
                     <img src="/blog/public/uploads/<?php echo $post['image_src']; ?>" alt="<?php echo $post['image_alt']; ?>" class="w-100 rounded">
