@@ -60,6 +60,7 @@ if(isset($_GET['event']) & isset($_GET['id'])){
 // submit edit form
     if(isset($_POST['btn_submit'])){
         if(isset($_POST['txt_name']) & $_POST['txt_name'] !== '' & isset($_POST['txt_email']) & $_POST['txt_email'] !== '' & isset($_POST['txt_password']) & $_POST['txt_password'] !== '' & isset($_POST['txt_role']) & $_POST['txt_role'] !== ''){
+            $id = $_GET['id'];  
             global  $user_id;
             $name = $_POST['txt_name'];
             $email = $_POST['txt_email'];
@@ -76,7 +77,7 @@ if(isset($_GET['event']) & isset($_GET['id'])){
                 $role = 1;
             }
 
-                $result = $connection->query("UPDATE users SET `Name`='$name',`Password`='$password',`Email`='$email',`Role`='$role',`Edited_by`='$user_id' WHERE ID='$id'") or die($error = "this email exist");
+                $result = $connection->query("UPDATE users SET `Name`='$name',`Password`='$password',`Email`='$email',`Role`='$role',`Edited_by`='$user_id' WHERE ID='$id'");
                 $connection->close();
                 header("location:./index.php?event=users");
 
