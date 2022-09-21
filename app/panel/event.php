@@ -25,6 +25,9 @@ if(isset($_GET['event']) || isset($_GET['id'])){
 }
 
 
+
+
+
 if(isset($_GET['event']) & isset($_GET['id'])){
     if($_GET['event'] === 'delete'){
         $id = $_GET['id'];

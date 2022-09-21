@@ -119,7 +119,7 @@ if(isset($_GET['event']) && $_GET['event'] === 'sign_out'){
                                 <a href="./index.php?event=users">لیست کاربران</a>
                             </li>
                             <li class="submenu-item">
-                                <a href="./event.php?event=create_user">ایجاد کاربران</a>
+                                <a href="./index.php?event=create_user">ایجاد کاربران</a>
                             </li>
                             <li class="submenu-item">
                                 <a href="./index.php?event=users">ویرایش کاربران</a>
@@ -203,14 +203,76 @@ if(isset($_GET['event']) && $_GET['event'] === 'sign_out'){
       <a class="btn btn-danger" href="./event.php?event=delete&id=<?php echo $users['ID'];?>">Delete</a>
       </td>
     </tr>
-        <?php }}}}?>
+        <?php }}?>
     </tbody>
 </table>
 
                 </div>
             </div>
+            <?php }}?>
 
 
+            <?php
+                // for create user
+
+$error = "";
+$success = "";
+
+            if(isset($_POST['btn_submit'])){
+                if(isset($_POST['txt_name']) & $_POST['txt_name'] !== '' & isset($_POST['txt_email']) & $_POST['txt_email'] != '' & isset($_POST['txt_password']) & $_POST['txt_password'] !== ''){
+                    $name = $_POST['txt_name'];
+                    $email = $_POST['txt_email'];
+                    $password = $_POST['txt_password'];
+                    $time = jdate('H:i:s ,Y/n/j');
+                    $creator = $_SESSION['user']['id'];
+                    $check_user = $connection->query("SELECT * FROM users WHERE `Email`='$email'");
+                    if($check_user->num_rows > 0){
+                        $error = "this user is exist";
+                    }else {
+                        $result = $connection->query("INSERT INTO users (`ID`,`Name`,`Email`,`Password`,`Role`,`create_time`,`last_login`,`status`,`Edited_by`,`creator`) VALUES (NULL,'$name','$email','$password',1,'$time',NULL,0,NULL,'$creator')");
+                        $connection->close();
+                        $success = "user created";
+                    }
+
+                }else {
+                    $error = "please fill out the form";
+                }
+            }
+            
+            
+            ?>
+
+
+                
+            <?php
+                // for create user
+            if(isset($_GET['event']) & $_SESSION['user']['role'] >= 10){
+                if($_GET['event'] === 'create_user'){ ?>
+                <div class="row justify-content-center">
+                <div class="col-6">
+                    <form action="./index.php?event=create_user" method="post">
+                        <label class="form-label" for="txt_name">username:</label>
+                        <input type="text" name="txt_name" class="form-control">
+                        <br>
+                        <label class="form-label" for="txt_email">email:</label>
+                        <input type="email" name="txt_email" class="form-control">
+                        <br>
+                        <label class="form-label" for="txt_password">password:</label>
+                        <input type="password" name="txt_password" class="form-control">
+                        <br>
+                        <button name="btn_submit" class="btn btn-success" type="submit">submit</button>
+                    </form>
+                    <br>
+                    <?php if(isset($error) && $error !== ""){?>
+                <span class="alert alert-danger text-danger p-2 m-2"><?php echo $error;?></span>
+                <?php }?>
+
+                <?php if(isset($success) && $success !== "" & $error === ""){?>
+                <span class="alert alert-success text-success p-2 m-2"><?php echo $success;?></span>
+                <?php }?>
+                </div>
+            </div>
+                <?php }}?>
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
