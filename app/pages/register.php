@@ -43,7 +43,7 @@ if(isset($_POST['btn_submit'])){
                             $error = "$email این ایمیل قبلا ثبت شده";
                         }else{
         
-                        $result = $connection->query("INSERT INTO users (`ID`,`Name`,`Email`,`Password`,`Role`,`create_time`,`last_login`,`status`) VALUES (NULL,'$name','$email','$password',1,'$time',NULL,0)");
+                        $result = $connection->query("INSERT INTO users (`ID`,`Name`,`Email`,`Password`,`Role`,`create_time`,`last_login`,`status`,`creator`) VALUES (NULL,'$name','$email','$password',1,'$time',NULL,0,'system')");
         
                         $connection->close();
                         header("location:../../index.php");
