@@ -8,8 +8,9 @@ if(!isset($_SESSION['user'])){
     exit();
 }
 
+$user_id = $_SESSION['user']['id'];
+
 if(isset($_GET['event']) && $_GET['event'] === 'sign_out'){
-    $user_id = $_SESSION['user']['id'];
     $exit = $connection->query("UPDATE users SET `status`=0 WHERE ID='$user_id'");
     unset($_SESSION['user']);
     if(!isset($_SESSION['user'])){
@@ -65,7 +66,7 @@ if(isset($_GET['event']) && $_GET['event'] === 'sign_out'){
                     </li>
 
 
-                   <?php if($_SESSION['user']['role'] >=5){?>
+                   <?php if($_SESSION['user']['role'] > 1){?>
 
                     <li x-data="dropdown" class="sidebar-item">
                         <div @click="toggle" class="sidebar-link">
@@ -75,13 +76,13 @@ if(isset($_GET['event']) && $_GET['event'] === 'sign_out'){
                         </div>
                         <ul x-show="open" x-transition class="submenu">
                             <li class="submenu-item">
-                                <a href="./products_index.html">لیست مقاله ها</a>
+                                <a href="./index.php?event=articles">لیست مقاله های من</a>
                             </li>
                             <li class="submenu-item">
-                                <a href="#">ایجاد مقاله</a>
+                                <a href="./index.php?event=create_article">ایجاد مقاله</a>
                             </li>
                             <li class="submenu-item">
-                                <a href="#">ویرایش مقاله</a>
+                                <a href="./index.php?event=articles">ویرایش مقاله</a>
                             </li>
                         </ul>
                     </li>
@@ -463,6 +464,116 @@ $success = "";
                             </div>
                         </div>
                             <?php }}?>
+
+
+                    <?php if(isset($_GET['event'])){
+                        if($_GET['event'] === "articles" & $_SESSION['user']['role'] > 1){                            
+ ?>
+<div class="row justify-content-center">
+                            <div class="col-6">
+
+                                    <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+        <th scope="col">name</th>
+        <th scope="col">status</th>
+        <th scope="col">views</th>
+        <th scope="col">events</th>
+
+    </tr>
+  </thead>
+  <tbody>
+        <?php
+        $result = $connection->query("SELECT * FROM articles WHERE `creator`='$user_id'");
+        if($result->num_rows > 0){
+            while($posts = $result->fetch_assoc()){
+        ?>
+        <tr>
+            <th scope="col"><?php echo $posts['ID'];?></th>
+            <td><?php echo $posts['article_title'];?></td>
+            <td><?php if($posts['status'] == 1){
+                echo "<span class='alert alert-success p-1'>accepted</span>";
+            }elseif($posts['status']== 0){  echo "<span class='alert alert-danger p-1'>wait</span>";} ?></td>
+            <td><?php echo $posts['views'];?></td>
+            <td><a class="btn btn-danger" href="./article_event.php?id=<?php echo $posts['ID'];?>&event=delete">delete</a></td>
+
+            <?php if($posts['status'] == 0){?>
+                <td><a class="btn btn-warning" href="./article_event.php?id=<?php echo $posts['ID'];?>&event=edit">edit</a></td>
+                <?php }?>
+        </tr>
+            <?php }}?>
+  </tbody>
+</table>
+                            </div>
+                        </div>
+                            <?php }}?>
+
+
+
+
+
+                <?php
+                // create article
+
+
+                if(isset($_POST['btn_submit_article'])){
+                    if(isset($_POST['txt_title']) & $_POST['txt_title'] !== "" & isset($_POST['txt_description']) & $_POST['txt_description'] !== "" & isset($_FILES['txt_file']) & $_FILES['txt_file'] !== ""){
+
+                        $title = htmlspecialchars($_POST['txt_title']);
+                        $description = htmlspecialchars($_POST['txt_description']);
+                        $file = $_FILES['txt_file'];
+                        $time = jdate('H:i:s ,Y/n/j');
+                        $uploaded_dir =time().".png";
+    move_uploaded_file($file['tmp_name'],"../../public/uploads/".$uploaded_dir);
+
+    $result= $connection->query("INSERT INTO articles (`ID`,`article_title`,`article_description`,`status`,`create_time`,`views`,`image_src`,`image_alt`,`creator`) VALUES (NULL,'$title','$description',0,'$time',0,'$uploaded_dir','$uploaded_dir','$user_id')");
+                    
+    $success = "عملیات انجام شد این پست پس از تایید ادمین انتشار می یابد";
+
+                    }else {
+                        $error = "please fill out the form";
+                    }
+                }
+                
+                ?>
+
+
+
+
+                    <?php
+                    if(isset($_GET['event'])){
+                        if($_GET['event'] === "create_article"){
+                    ?>
+
+                    <div class="row justify-content-center">
+                        <div class="col-6">
+                            <form action="./index.php?event=create_article" method="POST" enctype="multipart/form-data">
+                                <label for="txt_title">title:</label>
+                                <input type="text" name="txt_title" class="form-control">
+                                <br>
+                                <label for="txt_description">description:</label>
+                                <textarea name="txt_description" class="form-control" cols="30" rows="10"></textarea>
+                                <br>
+                                <label for="txt_file">upload your file:</label>
+                                <input type="file" name="txt_file" class="form-control">
+                                <br>
+                                <button type="submit" name="btn_submit_article" class="btn btn-success">submit</button>
+                            </form>
+                            <br>
+
+                            <?php if(isset($error) && $error !== "" && $success === ""){?>
+                <span class="alert alert-danger text-danger p-2 m-2"><?php echo $error;?></span>
+                <?php }?>
+
+                <?php if(isset($success) && $success !== "" && $error === ""){?>
+                <span class="alert alert-success text-success p-2 m-2"><?php echo $success;?></span>
+                <?php }?>
+
+                        </div>
+                    </div>
+
+                        <?php }}?>
 
 
 
