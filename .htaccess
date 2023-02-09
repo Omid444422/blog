@@ -1,0 +1,20 @@
+RewriteBase /
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.+)$ blog/index.php [QSA,L]
+
+
+DirectoryIndex index.php
+
+
+Options -Indexes
+
+allow from all
+
+
+
+ErrorDocument 404 errors/404.html
+
+
+
+
